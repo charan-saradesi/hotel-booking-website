@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useUser } from "@clerk/clerk-react";
+import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/lib/supabase";
+import type { Hotel } from "@/lib/hotels";
 
 interface AvailabilityRow {
     id: string;
@@ -22,13 +25,31 @@ type Tab = "availability" | "bookings" | "property";
 
 export default function HotelDashboard() {
     const navigate = useNavigate();
-    
+    const { user } = useUser();
+    const { role, loading } = useProfile();
 
     const [hotels, setHotels] = useState<Hotel[]>([]);
     const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
     const [tab, setTab] = useState<Tab>("availability");
 
-   
+    useEffect(() => {
+        if (!loading && role !== "hotel_owner" && role !== "admin") {
+            navigate("/", { replace: true });
+        }
+    }, [loading, role, navigate]);
+
+    useEffect(() => {
+        if (!user) return;
+        supabase
+            .from("hotels")
+            .select("*")
+            .eq("owner_clerk_id", user.id)
+            .then(({ data }) => {
+                const list = (data ?? []) as Hotel[];
+                setHotels(list);
+                if (list.length > 0) setSelectedHotelId(list[0].id);
+            });
+    }, [user]);
 
     if (loading) {
         return (
@@ -92,7 +113,13 @@ export default function HotelDashboard() {
                 ))}
             </div>
 
-            
+            <div className="mt-8">
+                {selectedHotelId && tab === "availability" && (
+                    <AvailabilityPanel hotelId={selectedHotelId} />
+                )}
+                {selectedHotelId && tab === "bookings" && <BookingsPanel hotelId={selectedHotelId} />}
+                {selectedHotel && tab === "property" && <PropertyPanel hotel={selectedHotel} />}
+            </div>
         </div>
     );
 }
@@ -147,7 +174,10 @@ function AvailabilityPanel({ hotelId }: { hotelId: string }) {
         load();
     };
 
-    
+    const removeRow = async (id: string) => {
+        await supabase.from("availability").delete().eq("id", id);
+        if (editingId === id) resetForm();
+        load();
     };
 
     return (
@@ -248,7 +278,10 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
         void load();
     }, [hotelId]);
 
-   
+    const updateStatus = async (id: string, status: string) => {
+        await supabase.from("bookings").update({ status }).eq("id", id);
+        load();
+    };
 
     return (
         <div>
