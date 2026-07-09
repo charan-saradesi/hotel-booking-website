@@ -111,7 +111,7 @@ export default function HotelDetail() {
                                               ) : (
                             <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                                 {availability.map((a) => (
-                                    
+                                    git
                                     >
                                         <div className="font-medium">{a.date}</div>
                                         <div className="text-xs text-muted-foreground">
