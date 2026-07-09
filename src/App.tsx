@@ -1,19 +1,25 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import PostLogin from "@/(root)/PostLogin.tsx";
+
+
 
 
 
 
 
 function App() {
-  return (
-      <Routes>
-        <Route path="/" element={<Home />} />
+    return (
+        <Routes>
+            <Route path="/" element={<Home />} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-  );
+            <Route path="/redirect" element={<PostLogin />} />
+
+
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
 }
 
 export default App;
