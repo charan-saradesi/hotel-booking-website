@@ -32,7 +32,19 @@ export default function HotelDashboard() {
 
    
 
-    
+    if (hotels.length === 0) {
+        return (
+            <div className="mx-auto max-w-3xl px-6 py-16 text-center">
+                <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+                    Hotel dashboard
+                </p>
+                <h1 className="mt-2 font-display text-3xl">No property assigned yet</h1>
+                <p className="mt-3 text-sm text-muted-foreground">
+                    Ask an admin to link your account to a hotel listing.
+                </p>
+            </div>
+        );
+    }
 
     const selectedHotel = hotels.find((h) => h.id === selectedHotelId);
 
@@ -252,3 +264,80 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
     );
 }
 
+function PropertyPanel({ hotel }: { hotel: Hotel }) {
+    const [form, setForm] = useState<Hotel>(hotel);
+    const [saving, setSaving] = useState(false);
+
+    
+
+    const save = async () => {
+        setSaving(true);
+        const { error } = await supabase
+            .from("hotels")
+            .update({
+                description: form.description,
+                cover_image: form.cover_image,
+                star_rating: form.star_rating,
+            })
+            .eq("id", form.id);
+        setSaving(false);
+        if (error) {
+            alert(`Failed to save: ${error.message}`);
+        }
+    };
+
+    return (
+        <div>
+            <h2 className="font-display text-xl">Property info</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+                Name, city, and country are managed by admin.
+            </p>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-6 md:grid-cols-2">
+                <label className="flex flex-col gap-1 md:col-span-2">
+          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+            Cover image URL
+          </span>
+                    <input
+                        value={form.cover_image}
+                        onChange={(e) => setForm({ ...form, cover_image: e.target.value })}
+                        className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
+                    />
+                </label>
+                <label className="flex flex-col gap-1">
+          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+            Star rating
+          </span>
+                    <input
+                        type="number"
+                        step="0.1"
+                        min={1}
+                        max={5}
+                        value={form.star_rating}
+                        onChange={(e) => setForm({ ...form, star_rating: Number(e.target.value) })}
+                        className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
+                    />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+            Description
+          </span>
+                    <textarea
+                        value={form.description}
+                        onChange={(e) => setForm({ ...form, description: e.target.value })}
+                        rows={4}
+                        className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
+                    />
+                </label>
+            </div>
+
+            <button
+                onClick={save}
+                disabled={saving}
+                className="mt-6 rounded-xl bg-accent px-5 py-2.5 text-xs font-medium uppercase tracking-widest text-accent-foreground transition hover:opacity-90 disabled:opacity-50"
+            >
+                {saving ? "Saving…" : "Save changes"}
+            </button>
+        </div>
+    );
+}
