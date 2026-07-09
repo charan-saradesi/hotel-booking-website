@@ -2,7 +2,7 @@
 
 A modern hotel booking web app for browsing and reserving stays across Indian cities — clean card-based listings, city/region search, and role-based dashboards for guests, hotel owners, and admins.
 
-**Live demo:** [https://lumihaven.vercel.app](https://lumihaven.vercel.app) <!-- ⚠️ replace with your actual Vercel deployment URL -->
+**Live demo:** [https://lumihaven.vercel.app](https://v2-5or5cb6i2-charan-saradesis-projects.vercel.app) 
 
 ---
 
