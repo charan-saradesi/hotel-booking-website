@@ -1,14 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense } from "react";
-import { useNavigate } from "react-router-dom";
+
 import heroImg from "@/assets/hero.jpg";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SearchBar } from "@/components/search-bar";
 import { HotelCard } from "@/components/hotel-card";
 import { hotelsListQuery } from "@/lib/hotels";
-import { Link } from "react-router-dom";
-import { ErrorBoundary } from "react-error-boundary";
 
 const places = [
     { name: "Goa", copy: "Sun-bleached shacks, Portuguese lanes, and long low tides." },
@@ -58,61 +55,9 @@ export default function Home() {
             </section>
 
             {/* Places strip */}
-            <section className="mx-auto mt-24 max-w-7xl px-6">
-                <div className="flex items-end justify-between gap-6">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                            Where to
-                        </p>
-                        <h2 className="mt-2 font-display text-3xl md:text-4xl">Browse by places</h2>
-                    </div>
-                </div>
-                <div className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-border md:grid-cols-4">
-                    {places.map((p) => (
-                        <Link
-                            key={p.name}
-                            to={`/search?region=${encodeURIComponent(p.name)}`}
-                            className="group bg-card p-8 transition hover:bg-secondary"
-                        >
-                            <div className="text-xs uppercase tracking-widest text-muted-foreground">Place</div>
-                            <div className="mt-2 font-display text-2xl">{p.name}</div>
-                            <p className="mt-3 text-sm text-muted-foreground">{p.copy}</p>
-                            <div className="mt-6 text-xs uppercase tracking-widest text-accent">
-                                See stays →
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </section>
 
             {/* Featured */}
-            <section className="mx-auto mt-24 max-w-7xl px-6">
-                <div className="flex items-end justify-between gap-6">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                            This month
-                        </p>
-                        <h2 className="mt-2 font-display text-3xl md:text-4xl">Rooms worth the flight</h2>
-                    </div>
-                    <Link
-                        to="/search"
-                        className="hidden text-xs uppercase tracking-widest text-accent hover:opacity-70 md:inline"
-                    >
-                        All stays →
-                    </Link>
-                </div>
-                <ErrorBoundary
-                    fallback={
-                        <p className="mt-10 text-sm text-muted-foreground">
-                            Couldn't load hotels right now — check back soon.
-                        </p>
-                    }
-                >
-                    <Suspense fallback={<CardsFallback />}>
-                        <FeaturedHotels />
-                    </Suspense>
-                </ErrorBoundary>
-            </section>
+
 
             {/* Editorial band */}
             <section className="mx-auto mt-28 max-w-4xl px-6 text-center">
