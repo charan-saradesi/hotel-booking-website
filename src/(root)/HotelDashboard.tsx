@@ -30,7 +30,13 @@ export default function HotelDashboard() {
 
    
 
-   
+    if (loading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-background">
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading…</p>
+            </div>
+        );
+    }
 
     if (hotels.length === 0) {
         return (
@@ -99,7 +105,14 @@ function AvailabilityPanel({ hotelId }: { hotelId: string }) {
     const [rooms, setRooms] = useState(1);
     const [price, setPrice] = useState(5000);
 
-   
+    const load = async () => {
+        const { data } = await supabase
+            .from("availability")
+            .select("*")
+            .eq("hotel_id", hotelId)
+            .order("date", { ascending: true });
+        setRows((data ?? []) as AvailabilityRow[]);
+    };
 
     useEffect(() => {
         void load();
@@ -254,7 +267,25 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
                                 {b.status}
                             </div>
                         </div>
-                       
+                        <div className="flex gap-2">
+                            {b.status !== "confirmed" && (
+                                <button
+                                    onClick={() => updateStatus(b.id, "confirmed")}
+                                    className="rounded-lg border border-border px-3 py-1.5 text-xs uppercase tracking-widest hover:bg-secondary"
+                                >
+                                    Confirm
+                                </button>
+                            )}
+                            {b.status !== "cancelled" && (
+                                <button
+                                    onClick={() => updateStatus(b.id, "cancelled")}
+                                    className="rounded-lg border border-border px-3 py-1.5 text-xs uppercase tracking-widest text-red-500 hover:bg-red-50"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 ))}
                 {bookings.length === 0 && (
                     <p className="text-sm text-muted-foreground">No bookings yet.</p>
@@ -268,7 +299,9 @@ function PropertyPanel({ hotel }: { hotel: Hotel }) {
     const [form, setForm] = useState<Hotel>(hotel);
     const [saving, setSaving] = useState(false);
 
-    
+    useEffect(() => {
+        setForm(hotel);
+    }, [hotel]);
 
     const save = async () => {
         setSaving(true);
