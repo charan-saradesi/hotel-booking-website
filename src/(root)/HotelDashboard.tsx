@@ -65,7 +65,7 @@ function daysUntil(dateStr: string) {
 /** Animates a number counting up from 0 whenever `value` changes. */
 function useCountUp(value: number | null, duration = 900) {
     const [display, setDisplay] = useState(0);
-    const frame = useRef<number>();
+    const frame = useRef<number | undefined>(undefined);
 
     useEffect(() => {
         if (value === null) return;
@@ -151,7 +151,7 @@ export default function HotelDashboard() {
     if (loading) {
         return (
             <div className="min-h-screen bg-background">
-                <SiteHeader variant="default" />
+                <SiteHeader variant="solid" />
                 <div className="flex min-h-[70vh] items-center justify-center">
                     <div className="flex flex-col items-center gap-3">
                         <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
@@ -165,7 +165,7 @@ export default function HotelDashboard() {
     if (hotels.length === 0) {
         return (
             <div className="min-h-screen bg-background">
-                <SiteHeader variant="default" />
+                <SiteHeader variant="solid" />
                 <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 text-center">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent animate-ring-pulse">
                         <Building2 size={24} strokeWidth={1.75} />
@@ -188,7 +188,7 @@ export default function HotelDashboard() {
     return (
         <div className="min-h-screen bg-background">
             <DashboardStyles />
-            <SiteHeader variant="default" />
+            <SiteHeader variant="solid" />
             <div className="mx-auto max-w-5xl px-6 py-14">
                 {/* Identity header */}
                 <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-6 py-7 sm:px-8">
