@@ -16,6 +16,7 @@ import {
     Sparkles,
     ArrowUpRight,
 } from "lucide-react";
+import { SiteHeader } from "@/components/site-header";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
 import type { Hotel } from "@/lib/hotels";
@@ -149,10 +150,13 @@ export default function HotelDashboard() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-background">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading…</p>
+            <div className="min-h-screen bg-background">
+                <SiteHeader variant="default" />
+                <div className="flex min-h-[70vh] items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground">Loading…</p>
+                    </div>
                 </div>
             </div>
         );
@@ -160,18 +164,21 @@ export default function HotelDashboard() {
 
     if (hotels.length === 0) {
         return (
-            <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent animate-ring-pulse">
-                    <Building2 size={24} strokeWidth={1.75} />
+            <div className="min-h-screen bg-background">
+                <SiteHeader variant="default" />
+                <div className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent animate-ring-pulse">
+                        <Building2 size={24} strokeWidth={1.75} />
+                    </div>
+                    <p className="mt-5 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+                        Hotel dashboard
+                    </p>
+                    <h1 className="mt-2 font-display text-3xl">No property assigned yet</h1>
+                    <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+                        Ask an admin to link your account to a hotel listing to start managing availability
+                        and bookings.
+                    </p>
                 </div>
-                <p className="mt-5 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                    Hotel dashboard
-                </p>
-                <h1 className="mt-2 font-display text-3xl">No property assigned yet</h1>
-                <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-                    Ask an admin to link your account to a hotel listing to start managing availability and
-                    bookings.
-                </p>
             </div>
         );
     }
@@ -179,84 +186,86 @@ export default function HotelDashboard() {
     const selectedHotel = hotels.find((h) => h.id === selectedHotelId);
 
     return (
-        <div className="mx-auto max-w-5xl px-6 py-14">
+        <div className="min-h-screen bg-background">
             <DashboardStyles />
-
-            {/* Identity header */}
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-6 py-7 sm:px-8">
-                {/* decorative dot-grid pattern */}
-                <svg
-                    aria-hidden="true"
-                    className="pointer-events-none absolute right-0 top-0 h-full w-1/2 text-accent/10"
-                >
-                    <pattern id="dotgrid" width="18" height="18" patternUnits="userSpaceOnUse">
-                        <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" />
-                    </pattern>
-                    <rect width="100%" height="100%" fill="url(#dotgrid)" />
-                </svg>
-
-                <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent/10 font-display text-lg text-accent animate-ring-pulse">
-                            {selectedHotel ? initials(selectedHotel.name) : ""}
-                        </div>
-                        <div>
-                            <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                                <Sparkles size={12} className="text-accent" />
-                                Hotel dashboard
-                            </p>
-                            <h1 className="mt-1 font-display text-3xl leading-tight md:text-4xl">
-                                {selectedHotel?.name}
-                            </h1>
-                            {selectedHotel && (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    {selectedHotel.city}, {selectedHotel.country}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {hotels.length > 1 && (
-                        <select
-                            value={selectedHotelId ?? ""}
-                            onChange={(e) => setSelectedHotelId(e.target.value)}
-                            className="h-10 rounded-full border border-border bg-background px-4 text-sm outline-none transition hover:border-accent/50 focus:border-accent"
-                        >
-                            {hotels.map((h) => (
-                                <option key={h.id} value={h.id}>
-                                    {h.name}
-                                </option>
-                            ))}
-                        </select>
-                    )}
-                </div>
-            </div>
-
-            {/* Tab nav */}
-            <div className="mt-8 flex gap-1 rounded-full border border-border bg-card p-1 sm:inline-flex">
-                {TABS.map(({ key, label, icon: Icon }) => (
-                    <button
-                        key={key}
-                        onClick={() => setTab(key)}
-                        className={
-                            "flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-medium uppercase tracking-widest transition sm:flex-none " +
-                            (tab === key
-                                ? "bg-accent text-accent-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground")
-                        }
+            <SiteHeader variant="default" />
+            <div className="mx-auto max-w-5xl px-6 py-14">
+                {/* Identity header */}
+                <div className="relative overflow-hidden rounded-3xl border border-border bg-card px-6 py-7 sm:px-8">
+                    {/* decorative dot-grid pattern */}
+                    <svg
+                        aria-hidden="true"
+                        className="pointer-events-none absolute right-0 top-0 h-full w-1/2 text-accent/10"
                     >
-                        <Icon size={14} strokeWidth={2} />
-                        {label}
-                    </button>
-                ))}
-            </div>
+                        <pattern id="dotgrid" width="18" height="18" patternUnits="userSpaceOnUse">
+                            <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" />
+                        </pattern>
+                        <rect width="100%" height="100%" fill="url(#dotgrid)" />
+                    </svg>
 
-            <div className="mt-10">
-                {selectedHotelId && tab === "availability" && (
-                    <AvailabilityPanel hotelId={selectedHotelId} />
-                )}
-                {selectedHotelId && tab === "bookings" && <BookingsPanel hotelId={selectedHotelId} />}
-                {selectedHotel && tab === "property" && <PropertyPanel hotel={selectedHotel} />}
+                    <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent/10 font-display text-lg text-accent animate-ring-pulse">
+                                {selectedHotel ? initials(selectedHotel.name) : ""}
+                            </div>
+                            <div>
+                                <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
+                                    <Sparkles size={12} className="text-accent" />
+                                    Hotel dashboard
+                                </p>
+                                <h1 className="mt-1 font-display text-3xl leading-tight md:text-4xl">
+                                    {selectedHotel?.name}
+                                </h1>
+                                {selectedHotel && (
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {selectedHotel.city}, {selectedHotel.country}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {hotels.length > 1 && (
+                            <select
+                                value={selectedHotelId ?? ""}
+                                onChange={(e) => setSelectedHotelId(e.target.value)}
+                                className="h-10 rounded-full border border-border bg-background px-4 text-sm outline-none transition hover:border-accent/50 focus:border-accent"
+                            >
+                                {hotels.map((h) => (
+                                    <option key={h.id} value={h.id}>
+                                        {h.name}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+                </div>
+
+                {/* Tab nav */}
+                <div className="mt-8 flex gap-1 rounded-full border border-border bg-card p-1 sm:inline-flex">
+                    {TABS.map(({ key, label, icon: Icon }) => (
+                        <button
+                            key={key}
+                            onClick={() => setTab(key)}
+                            className={
+                                "flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-xs font-medium uppercase tracking-widest transition sm:flex-none " +
+                                (tab === key
+                                    ? "bg-accent text-accent-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground")
+                            }
+                        >
+                            <Icon size={14} strokeWidth={2} />
+                            {label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="mt-10">
+                    {selectedHotelId && tab === "availability" && (
+                        <AvailabilityPanel hotelId={selectedHotelId} />
+                    )}
+                    {selectedHotelId && tab === "bookings" && <BookingsPanel hotelId={selectedHotelId} />}
+                    {selectedHotel && tab === "property" && <PropertyPanel hotel={selectedHotel} />}
+                </div>
             </div>
         </div>
     );
