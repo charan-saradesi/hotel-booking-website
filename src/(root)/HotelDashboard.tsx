@@ -394,7 +394,7 @@ function AvailabilityPanel({ hotelId }: { hotelId: string }) {
                                 Avg. nightly rate
                             </p>
                             <p className="mt-1 font-display text-2xl text-gradient">
-                                ₹{avgPrice.toLocaleString()}
+                                ${avgPrice.toLocaleString()}
                             </p>
                         </div>
                     </div>
@@ -431,7 +431,7 @@ function AvailabilityPanel({ hotelId }: { hotelId: string }) {
                     </label>
                     <label className="flex flex-col gap-1.5">
                         <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
-                            Price / night (₹)
+                            Price / night ($)
                         </span>
                         <input
                             type="number"
