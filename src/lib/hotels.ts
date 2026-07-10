@@ -12,6 +12,7 @@ export interface Hotel {
   star_rating: number;
   amenities: string[];
   cover_image: string;
+  owner_clerk_id?: string | null;
 }
 
 export function resolveImage(path: string) {
