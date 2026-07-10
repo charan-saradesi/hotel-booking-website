@@ -19,6 +19,7 @@ interface BookingRow {
     guests: number;
     status: string;
     clerk_user_id: string;
+    guest_name?: string;
 }
 
 type Tab = "availability" | "bookings" | "property";
@@ -262,6 +263,7 @@ function AvailabilityPanel({ hotelId }: { hotelId: string }) {
     );
 }
 
+
 function BookingsPanel({ hotelId }: { hotelId: string }) {
     const [bookings, setBookings] = useState<BookingRow[]>([]);
 
@@ -271,7 +273,24 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
             .select("*")
             .eq("hotel_id", hotelId)
             .order("created_at", { ascending: false });
-        setBookings((data ?? []) as BookingRow[]);
+
+        const rows = (data ?? []) as BookingRow[];
+        const clerkIds = [...new Set(rows.map((b) => b.clerk_user_id))];
+
+        if (clerkIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from("profiles")
+                .select("clerk_user_id, full_name, email")
+                .in("clerk_user_id", clerkIds);
+
+            const profileMap = new Map((profiles ?? []).map((p) => [p.clerk_user_id, p]));
+            rows.forEach((b) => {
+                const p = profileMap.get(b.clerk_user_id);
+                b.guest_name = p?.full_name || p?.email || "Guest";
+            });
+        }
+
+        setBookings(rows);
     };
 
     useEffect(() => {
@@ -293,7 +312,8 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
                         className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5"
                     >
                         <div>
-                            <div className="text-sm">
+                            <div className="text-sm font-medium">{b.guest_name}</div>
+                            <div className="text-sm text-muted-foreground">
                                 {b.check_in} → {b.check_out} · {b.guests} guests
                             </div>
                             <div className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -331,10 +351,23 @@ function BookingsPanel({ hotelId }: { hotelId: string }) {
 function PropertyPanel({ hotel }: { hotel: Hotel }) {
     const [form, setForm] = useState<Hotel>(hotel);
     const [saving, setSaving] = useState(false);
+    const [guestsHosted, setGuestsHosted] = useState<number | null>(null);
 
     useEffect(() => {
         setForm(hotel);
     }, [hotel]);
+
+    useEffect(() => {
+        supabase
+            .from("bookings")
+            .select("guests")
+            .eq("hotel_id", hotel.id)
+            .eq("status", "confirmed")
+            .then(({ data }) => {
+                const total = (data ?? []).reduce((sum, b) => sum + (b.guests ?? 0), 0);
+                setGuestsHosted(total);
+            });
+    }, [hotel.id]);
 
     const save = async () => {
         setSaving(true);
@@ -343,13 +376,11 @@ function PropertyPanel({ hotel }: { hotel: Hotel }) {
             .update({
                 description: form.description,
                 cover_image: form.cover_image,
-                star_rating: form.star_rating,
+                // star_rating removed — no longer owner-editable
             })
             .eq("id", form.id);
         setSaving(false);
-        if (error) {
-            alert(`Failed to save: ${error.message}`);
-        }
+        if (error) alert(`Failed to save: ${error.message}`);
     };
 
     return (
@@ -359,6 +390,21 @@ function PropertyPanel({ hotel }: { hotel: Hotel }) {
                 Name, city, and country are managed by admin.
             </p>
 
+            <div className="mt-4 flex gap-4">
+                <div className="rounded-2xl border border-border bg-card px-5 py-4">
+                    <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                        Guests hosted
+                    </div>
+                    <div className="mt-1 font-display text-2xl">{guestsHosted ?? "—"}</div>
+                </div>
+                <div className="rounded-2xl border border-border bg-card px-5 py-4">
+                    <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                        Rating
+                    </div>
+                    <div className="mt-1 font-display text-2xl">★ {hotel.star_rating.toFixed(1)}</div>
+                </div>
+            </div>
+
             <div className="mt-6 grid grid-cols-1 gap-4 rounded-2xl border border-border bg-card p-6 md:grid-cols-2">
                 <label className="flex flex-col gap-1 md:col-span-2">
           <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -367,20 +413,6 @@ function PropertyPanel({ hotel }: { hotel: Hotel }) {
                     <input
                         value={form.cover_image}
                         onChange={(e) => setForm({ ...form, cover_image: e.target.value })}
-                        className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
-                    />
-                </label>
-                <label className="flex flex-col gap-1">
-          <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
-            Star rating
-          </span>
-                    <input
-                        type="number"
-                        step="0.1"
-                        min={1}
-                        max={5}
-                        value={form.star_rating}
-                        onChange={(e) => setForm({ ...form, star_rating: Number(e.target.value) })}
                         className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none"
                     />
                 </label>
