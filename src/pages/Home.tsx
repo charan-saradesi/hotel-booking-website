@@ -52,7 +52,7 @@ export default function Home() {
                 </div>
 
                 {/* Floating search */}
-                <div className="mx-auto -mt-24 max-w-6xl px-6 md:-mt-20">
+                <div className="relative z-20 mx-auto -mt-24 max-w-6xl px-6 md:-mt-20">
                     <SearchBar />
                 </div>
             </section>
